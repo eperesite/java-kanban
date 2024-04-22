@@ -70,12 +70,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic createNewEpic(Epic epic) {
-        int ID = generateTaskId();
-        epic.setTaskID(ID);
-        storageEpic.put(ID, epic);
+        int id = generateTaskId();
+        epic.setTaskID(id);
+        storageEpic.put(id, epic);
         return epic;
     }
-
+    
     @Override
     public void updateEpic(Epic epic) {
         Epic existingEpic = storageEpic.get(epic.getTaskID());
