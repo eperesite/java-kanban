@@ -3,22 +3,83 @@ package manager;
 import task.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private List<Task> history = new ArrayList<>();
+    private Map<Integer, Node> taskMap = new HashMap<>();
+    private Node head;
+    private Node tail;
 
     @Override
     public void add(Task task) {
-        if (history.size() >= 10) {
-            history.remove(0);
+        int taskId = task.getTaskID();
+        if (taskMap.containsKey(taskId)) {
+            Node nodeToRemove = taskMap.get(taskId);
+            removeNode(nodeToRemove);
         }
-        history.add(task);
+
+        Node newNode = new Node(task);
+        if (head == null) {
+            head = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+        }
+        tail = newNode;
+        taskMap.put(taskId, newNode);
     }
 
+    @Override
+    public void remove(int id) {
+        if (taskMap.containsKey(id)) {
+            Node nodeToRemove = taskMap.get(id);
+            removeNode(nodeToRemove);
+        }
+    }
+
+    private void removeNode(Node nodeToRemove) {
+        taskMap.remove(nodeToRemove.task.getTaskID());
+        if (nodeToRemove == head && nodeToRemove == tail) {
+            // Single node in the list
+            head = null;
+            tail = null;
+        } else if (nodeToRemove == head) {
+            // Removing the head node
+            head = nodeToRemove.next;
+            head.prev = null;
+        } else if (nodeToRemove == tail) {
+            // Removing the tail node
+            tail = nodeToRemove.prev;
+            tail.next = null;
+        } else {
+            // Removing a node in between
+            nodeToRemove.prev.next = nodeToRemove.next;
+            nodeToRemove.next.prev = nodeToRemove.prev;
+        }
+    }
 
     @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(history);
+        List<Task> history = new ArrayList<>();
+        Node current = head;
+        while (current != null) {
+            history.add(current.task);
+            current = current.next;
+        }
+        return history;
+    }
+
+
+    private static class Node {
+        Task task;
+        Node prev;
+        Node next;
+
+        Node(Task task) {
+            this.task = task;
+        }
     }
 }
