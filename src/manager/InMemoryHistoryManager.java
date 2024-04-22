@@ -40,7 +40,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
+
+
     private void removeNode(Node nodeToRemove) {
+        System.out.println("Removing task: " + nodeToRemove.task.getNameTask());
         taskMap.remove(nodeToRemove.task.getTaskID());
         if (nodeToRemove == head && nodeToRemove == tail) {
             // Single node in the list
@@ -60,6 +63,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             nodeToRemove.next.prev = nodeToRemove.prev;
         }
     }
+
 
     @Override
     public List<Task> getHistory() {
