@@ -76,6 +76,17 @@ public class InMemoryHistoryManager implements HistoryManager {
         return history;
     }
 
+    public void removeTasksOfType(Class<?> type) {
+        List<Node> nodesToRemove = new ArrayList<>();
+        for (Node node : taskMap.values()) {
+            if (type.isInstance(node.task)) {
+                nodesToRemove.add(node);
+            }
+        }
+        for (Node nodeToRemove : nodesToRemove) {
+            removeNode(nodeToRemove);
+        }
+    }
 
     private static class Node {
         Task task;

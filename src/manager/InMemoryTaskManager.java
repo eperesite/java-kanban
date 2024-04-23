@@ -5,10 +5,7 @@ import task.SubTask;
 import task.Task;
 import task.TaskStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int taskID = 0;
@@ -35,9 +32,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTask() {
+        historyManager.removeTasksOfType(Task.class);
         storageTask.clear();
-        historyManager.getHistory().clear();
+
     }
+
 
     @Override
     public void updateTask(Task task) {
@@ -88,10 +87,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllEpic() {
+        historyManager.removeTasksOfType(Epic.class);
+        historyManager.removeTasksOfType(SubTask.class);
         storageEpic.clear();
         storageSubTask.clear();
-        historyManager.getHistory().clear();
+
     }
+
+
 
     @Override
     public void deleteEpicByID(Integer id) {
@@ -99,6 +102,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             for (int subTaskId : epic.getSubTaskIds()) {
                 storageSubTask.remove(subTaskId);
+                historyManager.remove(subTaskId);
             }
             storageEpic.remove(id);
             historyManager.remove(id);
@@ -155,11 +159,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllSubTask() {
         storageSubTask.clear();
         for (Epic epic : storageEpic.values()) {
-            epic.clearSubTaskIds();
-            updateStatus(epic);
+            for (int subTaskId : epic.getSubTaskIds()) {
+                historyManager.remove(subTaskId);
+            }
         }
-        historyManager.getHistory().clear();
     }
+
 
     @Override
     public void deleteSubTaskByID(Integer id) {
