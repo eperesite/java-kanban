@@ -46,19 +46,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         System.out.println("Removing task: " + nodeToRemove.task.getNameTask());
         taskMap.remove(nodeToRemove.task.getTaskID());
         if (nodeToRemove == head && nodeToRemove == tail) {
-            // Single node in the list
+
             head = null;
             tail = null;
         } else if (nodeToRemove == head) {
-            // Removing the head node
+
             head = nodeToRemove.next;
             head.prev = null;
         } else if (nodeToRemove == tail) {
-            // Removing the tail node
+
             tail = nodeToRemove.prev;
             tail.next = null;
         } else {
-            // Removing a node in between
+
             nodeToRemove.prev.next = nodeToRemove.next;
             nodeToRemove.next.prev = nodeToRemove.prev;
         }
