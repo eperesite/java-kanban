@@ -3,53 +3,65 @@ package task;
 import java.util.Objects;
 
 public class Task {
-    private int taskID;
-    private String nameTask;
-    private String description;
-    private TaskStatus status;
 
-    public Task(String nameTask, String description, TaskStatus status) {
-        this.nameTask = nameTask;
+    protected String description; // переменная для хранения описания
+    protected String taskName; // переменная для хранения задач
+    protected StatusTask statusTask; // статус задачи
+    protected int idNumber;// переменная для создания уникального номера задачи
+    protected TaskType type; // тип задачи
+
+    public Task(String taskName, String description) {
+        this.taskName = taskName;
         this.description = description;
-        this.status = status;
+        this.statusTask = StatusTask.NEW;
+        this.type = TaskType.TASK;
     }
 
-    public Task(String nameTask, String description) {
-        this.nameTask = nameTask;
-        this.description = description;
-
-    }
-
-    public int getTaskID() {
-        return taskID;
-    }
-
-    public void setTaskID(int taskID) {
-        this.taskID = taskID;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public String getNameTask() {
-        return nameTask;
+    public void setIdNumber(int idNumber) {
+        this.idNumber = idNumber;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setNameTask(String nameTask) {
-        this.nameTask = nameTask;
-    }
-
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public void setStatusTask(StatusTask statusTask) {
+        this.statusTask = statusTask;
+    }
+
+    public int getIdNumber() {
+        return idNumber;
+    }
+
+    public StatusTask getStatusTask() {
+        return statusTask;
+    }
+
+    public TaskType getType() {
+        return type;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "описание = '" + description + '\'' +
+                ", задача = '" + taskName + '\'' +
+                ", статус = " + statusTask +
+                ", id задачи = " + idNumber +
+                '}';
     }
 
     @Override
@@ -57,22 +69,11 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return taskID == task.taskID && Objects.equals(nameTask, task.nameTask)
-                && Objects.equals(description, task.description) && status == task.status;
+        return idNumber == task.idNumber;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nameTask, description, status, taskID);
-    }
-
-    @Override
-    public String toString() {
-        return "Task{" +
-                "nameTask='" + nameTask + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", taskID=" + taskID +
-                '}';
+        return Objects.hash(description, taskName, statusTask, idNumber);
     }
 }

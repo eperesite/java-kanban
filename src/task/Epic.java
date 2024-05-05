@@ -5,47 +5,58 @@ import java.util.Objects;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subTaskIds = new ArrayList<>();
+    private ArrayList<Integer> epicSubtasksID = new ArrayList<>();
 
-    public Epic(String nameTask, String description) {
-        super(nameTask, description);
+    public Epic(String taskName, String description) {
+        super(taskName, description);
+        this.type = TaskType.EPIC;
+    }
+
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
+    public void removeEpicSubtasksID(int idNumber) {
+        int index = epicSubtasksID.indexOf(idNumber);
+        if (index != -1) {
+            epicSubtasksID.remove(index);
+        }
+    }
+
+    public void addEpicSubtasksID(Integer idNumber) {
+        epicSubtasksID.add(idNumber);
     }
 
     public ArrayList<Integer> getSubTaskIds() {
-        return new ArrayList<>(subTaskIds);
+        return epicSubtasksID;
     }
 
-    public void setSubTaskId(int subTaskId) {
-        subTaskIds.add(subTaskId);
-    }
-
-    public void removeSubTaskId(int subTaskId) {
-        subTaskIds.remove(Integer.valueOf(subTaskId));
-    }
-
-    public void clearSubTaskIds() {
-        subTaskIds.clear();
+    public void clearSubtaskIdList() {
+        epicSubtasksID.clear();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Epic)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(subTaskIds, epic.subTaskIds);
+        return Objects.equals(epicSubtasksID, epic.epicSubtasksID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), subTaskIds);
+        return Objects.hash(super.hashCode(), epicSubtasksID);
     }
 
     @Override
     public String toString() {
         return "Epic{" +
-                super.toString() +
-                "subTaskIds=" + subTaskIds +
+                "описание = '" + getDescription() + '\'' +
+                ", задача = '" + getTaskName() + '\'' +
+                ", статус = " + getStatusTask() +
+                ", id задачи = " + getIdNumber() +
                 '}';
     }
+
 }

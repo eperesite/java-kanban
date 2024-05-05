@@ -7,42 +7,43 @@ import task.Task;
 import java.util.List;
 
 public interface TaskManager {
-    Task createNewTask(Task task);
+    List<Task> getAllTasks();
 
-    void deleteAllTask();
+    List<Task> getAllEpic();
 
-    void updateTask(Task task);
-
-    void deleteTaskByID(Integer id);
-
-    List<Task> getAllTask();
-
-    Task getTaskByID(int id);
-
-    Epic createNewEpic(Epic epic);
-
-    void updateEpic(Epic epic);
-
-    void deleteAllEpic();
-
-    void deleteEpicByID(Integer id);
-
-    List<Epic> getAllEpic();
-
-    Epic getEpicByID(int id);
-
-    SubTask createNewSubTask(SubTask subTask);
-
-    void updateSubTask(SubTask subTask);
-
-    void deleteAllSubTask();
-
-    void deleteSubTaskByID(Integer id);
-
-    List<SubTask> getAllSubTask();
-
-    SubTask getSubTaskByID(int id);
+    List<Task> getAllSubTask();
 
     List<Task> getHistory();
 
+    void removeAllTasks();
+
+    void removeAllEpics();
+
+    void removeAllSubtasks();
+
+    Task getSubTaskById(int idNumber);
+
+    Task getEpicById(int idNumber);
+
+    Task getTaskById(int idNumber);
+
+    void createTask(Task task);
+
+    void createEpic(Epic epic);
+
+    void createSubTask(SubTask subTask);
+
+    void updateTask(Task task);
+
+    void updateSubTask(SubTask subTask);
+
+    void updateEpic(Epic epic);
+
+    void deleteTask(int idNumber);
+
+    void deleteEpic(Integer idNumber);
+
+    void deleteSubTasks(Integer idNumber);
+
+    List<SubTask> getAllEpicSubtasks(Integer epicId);
 }

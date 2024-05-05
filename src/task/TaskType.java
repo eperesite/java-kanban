@@ -1,2 +1,5 @@
-package task;public class TaskType {
+package task;
+
+public enum TaskType {
+    TASK, EPIC, SUBTASK
 }

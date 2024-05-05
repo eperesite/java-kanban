@@ -3,19 +3,29 @@ package task;
 import java.util.Objects;
 
 public class SubTask extends Task {
-    private int epicId;
 
-    public SubTask(String nameTask, String description, TaskStatus status, int epicId) {
-        super(nameTask, description, status);
+    private int epicId;
+    protected TaskType type;
+
+    public SubTask(String taskName, String description, int epicId, StatusTask statusTask) {
+        super(taskName, description);
         this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
+        this.statusTask = statusTask;
+    }
+
+    public SubTask(String taskName, String description, int epicId) {
+        super(taskName, description);
+        this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
     }
 
     public int getEpicId() {
         return epicId;
     }
 
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
+    public TaskType getType() {
+        return type;
     }
 
     @Override
@@ -34,8 +44,11 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" + super.toString() +
-                "epicId=" + epicId +
+        return "SubTask{" +
+                "описание = '" + getDescription() + '\'' +
+                ", задача = '" + getTaskName() + '\'' +
+                ", статус = " + getStatusTask() +
+                ", id задачи = " + getIdNumber() +
                 '}';
     }
 }
