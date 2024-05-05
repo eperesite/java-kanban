@@ -19,8 +19,7 @@ public class ConvertioCVS {
             type = TaskType.TASK.toString();
         }
 
-        String line = task.getIdNumber() + "," + type + "," + task.getTaskName() + "," + task.getStatusTask() + "," +
-                task.getDescription();
+        String line = task.getIdNumber() + "," + type + "," + task.getTaskName() + "," + task.getStatusTask() + "," + task.getDescription();
 
         if (task.getType().equals(TaskType.SUBTASK)) {
             line = line + "," + ((SubTask) task).getEpicId();
