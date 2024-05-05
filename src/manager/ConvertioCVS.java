@@ -28,8 +28,6 @@ public class ConvertioCVS {
         return line;
     }
 
-    {
-    }
     public static Task fromString(String value) {
         String[] values = value.split(",");
         Task task = null;
