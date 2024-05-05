@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConvertioCVS {
-
+    // конвертировать данные task в текстовую строку
     public static String toString(Task task) {
         String type;
 
@@ -19,14 +19,20 @@ public class ConvertioCVS {
             type = TaskType.TASK.toString();
         }
 
-        String line = task.getIdNumber() + "," + type + "," + task.getTaskName() + "," + task.getStatusTask() + "," + task.getDescription();
+        // конвертировать task и epic в строку в формате:
+        // id,type,name,status,description
+        String line = task.getIdNumber() + "," + type + "," + task.getTaskName() + "," + task.getStatusTask() + "," +
+                task.getDescription();
 
+        // конвертировать subtask в строку в формате:
+        // id,type,name,status,description,epic
         if (task.getType().equals(TaskType.SUBTASK)) {
             line = line + "," + ((SubTask) task).getEpicId();
         }
         return line;
     }
 
+    // конвертировать данные task из текстовой строки
     public static Task fromString(String value) {
         String[] values = value.split(",");
         Task task = null;
@@ -44,6 +50,7 @@ public class ConvertioCVS {
         return task;
     }
 
+    // конвертировать id просмотренных task в текстовую строку
     public static String historyToString(HistoryManager manager) {
         StringBuilder viewedTaskId = new StringBuilder();
 
@@ -53,6 +60,7 @@ public class ConvertioCVS {
         return viewedTaskId.toString();
     }
 
+    // распарсить id просмотренных task из истории
     public static List<Integer> historyFromString(String value) {
         if (value != null) {
             String[] values = value.split(",");
