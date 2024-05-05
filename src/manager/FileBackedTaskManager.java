@@ -134,7 +134,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Epic epic = super.getEpicById(id);
         save();
         return epic;
-        
     }
 
     @Override
