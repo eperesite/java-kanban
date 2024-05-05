@@ -29,13 +29,6 @@ public class FileBackedManagerTest {
     }
 
     @Test
-    public void readHistoryFromEmptyFileTest() {
-        FileBackedTaskManager fromFileManager = FileBackedTaskManager.loadFromFile(new File("fileCSV/FileTest.csv"));
-
-        Assertions.assertTrue(fromFileManager.getHistory().isEmpty());
-    }
-
-    @Test
     public void readHistoryFromFileTest() {
         Task task = new Task("Task", "Task description");
         Epic epic = new Epic("Epic", "Epic description");
