@@ -9,7 +9,6 @@ import task.SubTask;
 import task.Task;
 
 
-
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
@@ -55,6 +54,10 @@ public class Main {
         printAllTasks(taskManager);
     }
 
+    {
+     int gjg = 8;
+    }
+
     private static void printAllTasks(TaskManager manager) {
         System.out.println("\nИстория просмотров:");
         for (int i = 0; i < manager.getHistory().size(); i++) {
@@ -71,5 +74,6 @@ public class Main {
         for (int i = 0; i < manager.getHistory().size(); i++) {
             System.out.println((i + 1) + ". " + manager.getHistory().get(i));
         }
+
     }
 }
