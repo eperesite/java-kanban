@@ -53,10 +53,7 @@ public class Main {
 
         printAllTasks(taskManager);
     }
-
-    {
-     int gjg = 8;
-    }
+    
 
     private static void printAllTasks(TaskManager manager) {
         System.out.println("\nИстория просмотров:");
