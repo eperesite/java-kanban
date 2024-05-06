@@ -193,7 +193,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void deleteEpic(Integer idNumber) {
         super.deleteEpic(idNumber);
-        save();
+        save(); 
     }
 
     @Override
