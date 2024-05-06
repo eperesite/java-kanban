@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
-
     private ArrayList<Integer> epicSubtasksID = new ArrayList<>();
 
     public Epic(String taskName, String description) {
