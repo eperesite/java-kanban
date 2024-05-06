@@ -22,8 +22,7 @@ public class Main {
         SubTask subTask5 = new SubTask("Исполнение плана 1", "Описание 1", 2);
         SubTask subTask6 = new SubTask("Исполнение плана 2", "Описание 2", 2);
         SubTask subTask7 = new SubTask("Исполнение плана 3", "Описание 3", 2);
-
-        // проверка работы истории просмотров задач
+        
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -53,7 +52,6 @@ public class Main {
 
         printAllTasks(taskManager);
     }
-    
 
     private static void printAllTasks(TaskManager manager) {
         System.out.println("\nИстория просмотров:");
@@ -65,8 +63,6 @@ public class Main {
         manager.deleteEpic(3);
         manager.deleteSubTasks(4);
 
-        // проверить историю после удаления task/epic/subtask
-        // в файле File.csv должны сохранится id в следующей последовательности: 1,2,5,6
         System.out.println("\nОбновленная история просмотров:");
         for (int i = 0; i < manager.getHistory().size(); i++) {
             System.out.println((i + 1) + ". " + manager.getHistory().get(i));
