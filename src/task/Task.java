@@ -3,12 +3,11 @@ package task;
 import java.util.Objects;
 
 public class Task {
-
-    protected String description; // переменная для хранения описания
-    protected String taskName; // переменная для хранения задач
-    protected StatusTask statusTask; // статус задачи
-    protected int idNumber;// переменная для создания уникального номера задачи
-    protected TaskType type; // тип задачи
+    protected String description;
+    protected String taskName;
+    protected StatusTask statusTask;
+    protected int idNumber;
+    protected TaskType type;
 
     public Task(String taskName, String description) {
         this.taskName = taskName;
@@ -52,7 +51,6 @@ public class Task {
     public TaskType getType() {
         return type;
     }
-
 
     @Override
     public String toString() {
