@@ -44,4 +44,6 @@ public interface TaskManager {
     void deleteEpic(Integer idNumber);
 
     void deleteSubTasks(Integer idNumber);
+
+    List<SubTask> getAllEpicSubtasks(Integer epicId);
 }
