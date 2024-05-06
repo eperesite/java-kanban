@@ -69,7 +69,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         fileManager.epics.put(task.getIdNumber(), (Epic) task);
                     } else if (task.getType().equals(TaskType.SUBTASK)) {
                         fileManager.subTasks.put(task.getIdNumber(), (SubTask) task);
-                        // получить epic подзадачи и записать id подзадачи в epic
                         Epic epic = fileManager.epics.get(((SubTask) task).getEpicId());
                         epic.getSubTaskIds().add(task.getIdNumber());
                     } else {
