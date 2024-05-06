@@ -22,7 +22,7 @@ public class Main {
         SubTask subTask5 = new SubTask("Исполнение плана 1", "Описание 1", 2);
         SubTask subTask6 = new SubTask("Исполнение плана 2", "Описание 2", 2);
         SubTask subTask7 = new SubTask("Исполнение плана 3", "Описание 3", 2);
-        
+
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -53,6 +53,7 @@ public class Main {
         printAllTasks(taskManager);
     }
 
+    
     private static void printAllTasks(TaskManager manager) {
         System.out.println("\nИстория просмотров:");
         for (int i = 0; i < manager.getHistory().size(); i++) {
