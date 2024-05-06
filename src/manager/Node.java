@@ -3,9 +3,9 @@ package manager;
 import task.Task;
 
 public class Node {
-    private Node previous; //ссылка на предыдущий элемент
-    private Task object; // текущий объект
-    private Node next; // ссылка на следующий элемент
+    private Node previous;
+    private Task object;
+    private Node next;
 
     public Node(Node previous, Task object, Node next) {
         this.previous = previous;
