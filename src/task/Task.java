@@ -10,9 +10,13 @@ public class Task {
     protected TaskType type;
 
     public Task(String taskName, String description) {
+        this(taskName, description, StatusTask.NEW);
+    }
+
+    protected Task(String taskName, String description, StatusTask statusTask) {
         this.taskName = taskName;
         this.description = description;
-        this.statusTask = StatusTask.NEW;
+        this.statusTask = statusTask;
         this.type = TaskType.TASK;
     }
 

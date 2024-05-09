@@ -8,19 +8,10 @@ import java.util.List;
 
 public class ConvertioCVS {
     public static String toString(Task task) {
-        String type;
-
-        if (task.getType().equals(TaskType.SUBTASK)) {
-            type = TaskType.SUBTASK.toString();
-        } else if (task.getType().equals(TaskType.EPIC)) {
-            type = TaskType.EPIC.toString();
-        } else {
-            type = TaskType.TASK.toString();
-        }
-
+        String type = task.getType().toString();
         String line = task.getIdNumber() + "," + type + "," + task.getTaskName() + "," + task.getStatusTask() + "," + task.getDescription();
 
-        if (task.getType().equals(TaskType.SUBTASK)) {
+        if (task.getType() == TaskType.SUBTASK) {
             line = line + "," + ((SubTask) task).getEpicId();
         }
         return line;
