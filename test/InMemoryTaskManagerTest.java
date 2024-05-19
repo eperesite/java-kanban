@@ -89,7 +89,7 @@ class InMemoryTaskManagerTest {
         assertEquals(1, subTasks.size(), "Incorrect number of subtasks in the list.");
         assertEquals(subTask, subTasks.get(0), "Subtasks do not match.");
     }
-    
+
     @Test
     void canNotUpdateEpicByNonExistentId() {
         Epic epic = new Epic("Epic", "Epic description");

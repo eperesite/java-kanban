@@ -35,7 +35,7 @@ class InMemoryHistoryManagerTest {
         manager.getTaskById(0);
         manager.getTaskById(1);
         manager.getTaskById(2);
-
+1
         List<Task> history = manager.getHistory();
 
         assertEquals(task1, history.get(0));
