@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class SubTask extends Task {1
+public class SubTask extends Task {
 
     private final int epicId;
 

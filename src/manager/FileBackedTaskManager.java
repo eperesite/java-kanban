@@ -8,7 +8,7 @@ import task.TaskType;
 import java.io.*;
 import java.util.List;
 
-public class FileBackedTaskManager extends InMemoryTaskManager {1
+public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
     public FileBackedTaskManager(File file) {
