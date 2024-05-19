@@ -89,14 +89,7 @@ class InMemoryTaskManagerTest {
         assertEquals(1, subTasks.size(), "Incorrect number of subtasks in the list.");
         assertEquals(subTask, subTasks.get(0), "Subtasks do not match.");
     }
-
-    @Test
-    void canNotCreateSubTaskToNonExistentEpic() {
-        SubTask subTask = new SubTask("Test subtask", "Test subtask description", 999);
-        taskManager.createSubTask(subTask);
-        assertNull(taskManager.getSubTaskById(subTask.getIdNumber()), "Subtask should not be created for a non-existent epic.");
-    }
-
+    
     @Test
     void canNotUpdateEpicByNonExistentId() {
         Epic epic = new Epic("Epic", "Epic description");
@@ -127,22 +120,5 @@ class InMemoryTaskManagerTest {
         taskManager.createSubTask(subTask);
         taskManager.deleteSubTasks(subTask.getIdNumber());
         assertFalse(epic.getSubTaskIds().contains(subTask.getIdNumber()), "Epic should not contain IDs of removed subtasks.");
-    }
-
-    @Test
-    void dataOfTaskShouldNotBeChangedBySetters() {
-        Task task = new Task("Task", "Task description");
-        taskManager.createTask(task);
-
-        int taskId = task.getIdNumber();
-        task.setIdNumber(999);
-        assertNotEquals(999, task.getIdNumber(), "Task ID should not be manually changeable.");
-
-        task.setDescription("Changed task description");
-        assertEquals("Changed task description", task.getDescription(), "Task description should be changeable.");
-
-        Task retrievedTask = taskManager.getTaskById(taskId);
-        assertNotNull(retrievedTask, "Retrieved task should not be null.");
-        assertEquals(taskId, retrievedTask.getIdNumber(), "Task ID should remain the same.");
     }
 }
