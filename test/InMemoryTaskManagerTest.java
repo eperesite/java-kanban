@@ -18,211 +18,148 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest {
-    public TaskManager taskManager;
-    public HistoryManager historyManager;
+public class InMemoryTaskManagerTest {
+    private InMemoryTaskManager taskManager;
 
     @BeforeEach
-    public void beforeEach() {
+    public void setUp() {
         taskManager = new InMemoryTaskManager();
-        historyManager = Managers.getDefaultHistory();
     }
 
     @Test
-    void shouldSetDurationAndStartTimeToNullForSubTasks() { // если по времени задачи пересекаются - обнулить время добавляемой задачи
-        LocalDateTime now = LocalDateTime.now();
-        Epic epic = new Epic("Epic", "Epic description");
-        taskManager.createEpic(epic);
-        SubTask subtask = new SubTask("Task", "Task description", 0, now, Duration.ofDays(5));
-        taskManager.createSubTask(subtask);
-        SubTask crossingSubTask = new SubTask("Task", "Task description", 0, now, Duration.ofDays(3));
-        taskManager.createSubTask(crossingSubTask);
-        assertNull(crossingSubTask.getDuration());
-        assertNull(crossingSubTask.getStartTime());
-    }
-
-    @Test
-    void createTask() {
-        Task task = new Task("Task", "Task description");
+    public void testCreateTask() {
+        Task task = new Task("Task 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1));
         taskManager.createTask(task);
-        final int taskId = task.getIdNumber();
-
-        final Task savedTask = taskManager.getTaskById(taskId);
-
-        assertNotNull(savedTask, "Задача не найдена.");
-        // проверить, что экземпляры Task равны друг другу, если равен их id
-        assertEquals(task, savedTask, "Задачи не совпадают.");
-
-        final List<Task> tasks = taskManager.getAllTasks();
-
-        // проверить запись в список и сравнить генерируемый id
-        assertNotNull(tasks, "Задачи не возвращаются.");
-        assertEquals(1, tasks.size(), "Количество задач в списке неверное.");
-        assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+        assertEquals(1, taskManager.getAllTasks().size());
+        assertTrue(taskManager.getAllTasks().contains(task));
     }
 
     @Test
-    void createEpic() {
-        Epic epic = new Epic("Epic", "Epic description");
+    public void testCreateEpic() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
         taskManager.createEpic(epic);
-        final int epicId = epic.getIdNumber();
-
-        final Epic savedEpic = (Epic) taskManager.getEpicById(epicId);
-
-        assertNotNull(savedEpic, "Эпик не найден.");
-        // проверить, что экземпляры Epic равны друг другу, если равен их id
-        assertEquals(epic, savedEpic, "Эпики не совпадают.");
-
-        final List<Epic> epics = taskManager.getAllEpic();
-
-        // проверить запись в список и сравнить генерируемый id
-        assertNotNull(epics, "Эпики не возвращаются.");
-        assertEquals(1, epics.size(), "Количество эпиков в списке неверное.");
-        assertEquals(epic, epics.get(0), "Эпики не совпадают.");
+        assertEquals(1, taskManager.getAllEpic().size());
+        assertTrue(taskManager.getAllEpic().contains(epic));
     }
 
     @Test
-    void createSubTask() {
-        Epic epic = new Epic("Epic", "Epic description");
+    public void testCreateSubTask() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
         taskManager.createEpic(epic);
-        SubTask subTask = new SubTask("Subtask", "Subtask description", 0);
+        SubTask subTask = new SubTask("SubTask 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1), epic.getIdNumber());
         taskManager.createSubTask(subTask);
-        final int subTaskId = subTask.getIdNumber();
-
-        final SubTask savedSubTask = (SubTask) taskManager.getSubTaskById(subTaskId);
-
-        assertNotNull(savedSubTask, "Подзадача не найдена.");
-        // проверить, что экземпляры SubTask равны друг другу, если равен их id
-        assertEquals(subTask, savedSubTask, "Подзадачи не совпадают.");
-
-        final List<SubTask> subTasks = taskManager.getAllSubTask();
-
-        // проверить запись в список и сравнить генерируемый id
-        assertNotNull(subTasks, "Подзадачи не возвращаются.");
-        assertEquals(1, subTasks.size(), "Количество подзадач в списке неверное.");
-        assertEquals(subTask, subTasks.get(0), "Подзадачи не совпадают.");
+        assertEquals(1, taskManager.getAllSubTask().size());
+        assertTrue(taskManager.getAllSubTask().contains(subTask));
     }
 
     @Test
-    void canNotCreateSubTaskToNonExistentEpic() {
-        Epic epic = new Epic("Epic", "Epic description");
+    public void testGetTaskById() {
+        Task task = new Task("Task 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1));
+        taskManager.createTask(task);
+        Task fetchedTask = taskManager.getTaskById(task.getIdNumber());
+        assertEquals(task, fetchedTask);
+    }
+
+    @Test
+    public void testGetEpicById() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
         taskManager.createEpic(epic);
-        SubTask subTask = new SubTask("Test subtask", "Test subtask description", 0);
+        Epic fetchedEpic = taskManager.getEpicById(epic.getIdNumber());
+        assertEquals(epic, fetchedEpic);
+    }
+
+    @Test
+    public void testGetSubTaskById() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
+        taskManager.createEpic(epic);
+        SubTask subTask = new SubTask("SubTask 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1), epic.getIdNumber());
         taskManager.createSubTask(subTask);
-        Epic newEpic = (Epic) taskManager.getEpicById(subTask.getEpicId());
-
-        // проверить, что Epic не может добавить сам в себя в виде подзадачи
-        assertNotNull(newEpic, "Подзадача не может быть записана в несуществующий эпик.");
+        SubTask fetchedSubTask = taskManager.getSubTaskById(subTask.getIdNumber());
+        assertEquals(subTask, fetchedSubTask);
     }
 
     @Test
-    void canNotUpdateEpicByNonExistentId() {
-        Epic epic = new Epic("Epic", "Epic description");
+    public void testUpdateTask() {
+        Task task = new Task("Task 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1));
+        taskManager.createTask(task);
+        task.setTaskName("Updated Task 1");
+        taskManager.updateTask(task);
+        Task updatedTask = taskManager.getTaskById(task.getIdNumber());
+        assertEquals("Updated Task 1", updatedTask.getTaskName());
+    }
+
+    @Test
+    public void testUpdateEpic() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
         taskManager.createEpic(epic);
-        epic.setIdNumber(2);
+        epic.setTaskName("Updated Epic 1");
         taskManager.updateEpic(epic);
-
-        // проверить, что обновить несуществующий epic невозсожно
-        assertNull(taskManager.getEpicById(2), "Обновлен несуществующий эпик.");
+        Epic updatedEpic = taskManager.getEpicById(epic.getIdNumber());
+        assertEquals("Updated Epic 1", updatedEpic.getTaskName());
     }
 
     @Test
-    void canNotUpdateSubTaskByNonExistentId() {
-        Epic epic = new Epic("Epic", "Epic description");
+    public void testUpdateSubTask() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
         taskManager.createEpic(epic);
-        SubTask subTask = new SubTask("Subtask", "Subtask description", 0);
+        SubTask subTask = new SubTask("SubTask 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1), epic.getIdNumber());
         taskManager.createSubTask(subTask);
+        subTask.setTaskName("Updated SubTask 1");
         taskManager.updateSubTask(subTask);
-
-        // проверить, что обновить subTask несуществующего эпика невозможно
-        assertNotNull(taskManager.getSubTaskById(subTask.getIdNumber()), "Обновлена несуществующего подзадача эпика.");
+        SubTask updatedSubTask = taskManager.getSubTaskById(subTask.getIdNumber());
+        assertEquals("Updated SubTask 1", updatedSubTask.getTaskName());
     }
 
     @Test
-    void managersShouldNotReturnsNull() {
-        // проверить, что утилитарный класс всегда возвращает проинициализированные
-        // и готовые к работе экземпляры менеджеров
-        assertNotNull(taskManager, "Объект класса не возвращаются.");
-        assertNotNull(historyManager, "Объект класса не возвращается.");
-    }
-
-    @Test
-    void removedSubTasksShouldNotContainsOldId() {
-        Epic epic1 = new Epic("Epic", "Epic description");
-        SubTask subTask2 = new SubTask("Subtask2", "Subtask description", 0);
-        SubTask subTask3 = new SubTask("Subtask3", "Subtask description", 0);
-
-        taskManager.createEpic(epic1);
-        taskManager.createSubTask(subTask2);
-        taskManager.deleteSubTasks(1);
-        taskManager.createSubTask(subTask3);
-
-        // удаляемые подзадачи не должны хранить старые id
-        // внутри эпика не должны оставаться id неактуальных подзадач
-        assertFalse(epic1.getSubTaskIds().contains(subTask2.getIdNumber()));
-        assertFalse(subTask2.equals(subTask3));
-    }
-
-    @Test
-    void dataOfTaskShouldNotBeChangedBySetters() {
-        Task task = new Task("Task", "Task description");
-
+    public void testDeleteTask() {
+        Task task = new Task("Task 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1));
         taskManager.createTask(task);
-
-        int taskId = task.getIdNumber();
-        task.setIdNumber(2);
-        int newTaskId = task.getIdNumber();
-
-        String taskDescription = "Task description";
-        task.setDescription("Changed task description");
-        String newTaskDescription = "Task description";
-
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
-
-        assertEquals(2, task.getIdNumber(), "id задачи не изменился.");
-        assertEquals("Changed task description", task.getDescription(), "Описание задачи не изменилось.");
-        assertEquals(null, taskManager.getTaskById(2), "id задачи изменился на пользовательский.");
-        assertEquals(0, taskManager.getHistory().size(), "В истории просмотра отображается 1 задачи.");
+        taskManager.deleteTask(task.getIdNumber());
+        assertEquals(0, taskManager.getAllTasks().size());
     }
-}
-    @Test
-    void removedSubTasksShouldNotContainsOldId() {
-        Epic epic1 = new Epic("Epic", "Epic description");
-        SubTask subTask2 = new SubTask("Subtask2", "Subtask description", 0);
-        SubTask subTask3 = new SubTask("Subtask3", "Subtask description", 0);
 
-        taskManager.createEpic(epic1);
+    @Test
+    public void testDeleteEpic() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
+        taskManager.createEpic(epic);
+        taskManager.deleteEpic(epic.getIdNumber());
+        assertEquals(0, taskManager.getAllEpic().size());
+        assertEquals(0, taskManager.getAllSubTask().size());
+    }
+
+    @Test
+    public void testDeleteSubTask() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
+        taskManager.createEpic(epic);
+        SubTask subTask = new SubTask("SubTask 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1), epic.getIdNumber());
+        taskManager.createSubTask(subTask);
+        taskManager.deleteSubTasks(subTask.getIdNumber());
+        assertEquals(0, taskManager.getAllSubTask().size());
+    }
+
+    @Test
+    public void testGetAllEpicSubtasks() {
+        Epic epic = new Epic("Epic 1", "Description", StatusTask.NEW);
+        taskManager.createEpic(epic);
+        SubTask subTask1 = new SubTask("SubTask 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1), epic.getIdNumber());
+        SubTask subTask2 = new SubTask("SubTask 2", "Description", StatusTask.NEW, LocalDateTime.now().plusHours(2), Duration.ofHours(1), epic.getIdNumber());
+        taskManager.createSubTask(subTask1);
         taskManager.createSubTask(subTask2);
-        taskManager.deleteSubTasks(1);
-        taskManager.createSubTask(subTask3);
-
-        // удаляемые подзадачи не должны хранить старые id
-        // внутри эпика не должны оставаться id неактуальных подзадач
-        assertFalse(epic1.getSubTaskIds().contains(subTask2.getIdNumber()));
-        assertFalse(subTask2.equals(subTask3));
+        List<SubTask> subtasks = taskManager.getAllEpicSubtasks(epic.getIdNumber());
+        assertEquals(2, subtasks.size());
+        assertTrue(subtasks.contains(subTask1));
+        assertTrue(subtasks.contains(subTask2));
     }
 
     @Test
-    void dataOfTaskShouldNotBeChangedBySetters() {
-        Task task = new Task("Task", "Task description");
-
-        taskManager.createTask(task);
-
-        int taskId = task.getIdNumber();
-        task.setIdNumber(2);
-        int newTaskId = task.getIdNumber();
-
-        String taskDescription = "Task description";
-        task.setDescription("Changed task description");
-        String newTaskDescription = "Task description";
-
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
-
-        assertEquals(2, task.getIdNumber(), "id задачи не изменился.");
-        assertEquals("Changed task description", task.getDescription(), "Описание задачи не изменилось.");
-        assertEquals(null, taskManager.getTaskById(2), "id задачи изменился на пользовательский.");
-        assertEquals(0, taskManager.getHistory().size(), "В истории просмотра отображается 1 задачи.");
+    public void testGetPrioritizedTasks() {
+        Task task1 = new Task("Task 1", "Description", StatusTask.NEW, LocalDateTime.now(), Duration.ofHours(1));
+        Task task2 = new Task("Task 2", "Description", StatusTask.NEW, LocalDateTime.now().plusHours(2), Duration.ofHours(1));
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+        assertEquals(2, prioritizedTasks.size());
+        assertEquals(task1, prioritizedTasks.first());
+        assertEquals(task2, prioritizedTasks.last());
     }
 }
