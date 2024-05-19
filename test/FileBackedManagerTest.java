@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedManagerTest {1
+public class FileBackedManagerTest {
     private TaskManager taskManager;
 
     @BeforeEach
