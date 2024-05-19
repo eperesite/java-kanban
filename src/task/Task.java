@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Task {1
+public class Task {
     protected String description;
     protected String taskName;
     protected StatusTask statusTask;

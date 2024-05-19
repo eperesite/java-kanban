@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 
 public class Main {
-    public static void main(String[] args) {1
+    public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Задача 1", "Описание 1", LocalDateTime.of(2024, 03, 15, 10, 15), Duration.ofMinutes(360));

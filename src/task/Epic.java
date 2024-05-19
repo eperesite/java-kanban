@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Epic extends Task {1
+public class Epic extends Task {
 
     private ArrayList<Integer> epicSubtasksId = new ArrayList<>();
 
