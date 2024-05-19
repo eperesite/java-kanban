@@ -25,8 +25,7 @@ public class Main {
         SubTask subTask5 = new SubTask("Исполнение плана 1", "Описание 1", 2, LocalDateTime.of(2024, 03, 17, 10, 00), Duration.ofMinutes(360));
         SubTask subTask6 = new SubTask("Исполнение плана 2", "Описание 2", 2, LocalDateTime.of(2024, 03, 17, 18, 00), Duration.ofMinutes(15));
         SubTask subTask7 = new SubTask("Исполнение плана 3", "Описание 3", 2, LocalDateTime.of(2024, 03, 18, 02, 00), Duration.ofMinutes(60));
-
-        taskManager.createTask(task1);
+        
         taskManager.createTask(task2);
 
         taskManager.createEpic(epic3);
