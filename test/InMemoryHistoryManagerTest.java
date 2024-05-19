@@ -12,103 +12,121 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryHistoryManagerTest {
-    InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
-    TaskManager manager = new InMemoryTaskManager();
+public class FileBackedManagerTest {
 
-    @Test
-    public void testHistoryManagerStoresPreviousTaskVersions() {
-        // *убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
-        Task task3 = new Task("Task 3", "Description 3");
+    private File file = new File("fileCSV/FileTest.csv");
 
-        manager.createTask(task1);
-        manager.createTask(task2);
-        manager.createTask(task3);
-        manager.getTaskById(0);
-        manager.getTaskById(1);
-        manager.getTaskById(2);
+    public TaskManager taskManager;
 
-        List<Task> history = manager.getHistory();
-
-        assertEquals(task1, history.get(0));
-        assertEquals(task2, history.get(1));
-        assertEquals(task3, history.get(2));
-        assertEquals(3, history.size());
+    @BeforeEach
+    public void beforeEach() {
+        taskManager = new FileBackedTaskManager(file);
     }
 
     @Test
-    public void addToHistory() {
-        Task task1 = new Task("Task", "Task description");
-        Epic epic2 = new Epic("Epic", "Epic description");
-        SubTask subTask3 = new SubTask("SubTask", "SubTask description", 1);
+    public void readHistoryFromEmptyFileTest() {
+        Task task = new Task("Task", "Task description", LocalDateTime.of(2024, 01, 01, 00, 00),
+                Duration.ofMinutes(15));
+        Epic epic = new Epic("Epic", "Epic description");
+        SubTask subTask = new SubTask("Subtask", "Subtask description", 1, LocalDateTime.of(2024, 01, 01, 01, 00),
+                Duration.ofMinutes(15));
 
-        manager.createTask(task1);
-        manager.createEpic(epic2);
-        manager.createSubTask(subTask3);
+        taskManager.createTask(task);
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask);
 
-        manager.getTaskById(0);
-        manager.getTaskById(0);
-        manager.getEpicById(1);
-        manager.getEpicById(1);
-        manager.getSubTaskById(2);
-        manager.getSubTaskById(2);
+        FileBackedTaskManager fromFileManager = FileBackedTaskManager.loadFromFile(new File("fileCSV/FileTest.csv"));
 
-        // проверить размер списка истории после повторных просмотров задач
-        assertEquals(3, manager.getHistory().size(), "Список истории сохраняет повторные просмотры задач.");
+        Assertions.assertTrue(taskManager.getHistory().isEmpty());
+        Assertions.assertTrue(fromFileManager.getHistory().isEmpty());
+        Assertions.assertEquals(taskManager.getHistory(), fromFileManager.getHistory(),
+                "Содержимое истории не соответствует.");
+        Assertions.assertEquals(taskManager.getTaskById(0), fromFileManager.getTaskById(0),
+                "Содержимое task не соответствует.");
+        Assertions.assertEquals(taskManager.getEpicById(1), fromFileManager.getEpicById(1),
+                "Содержимое epic не соответствует.");
+        Assertions.assertEquals(taskManager.getSubTaskById(2), fromFileManager.getSubTaskById(2),
+                "Содержимое epic не соответствует.");
     }
 
     @Test
-    public void removeToHistory() {
-        Task task1 = new Task("Task 1", "Description 1");
-        Task task2 = new Task("Task 2", "Description 2");
-        Task task3 = new Task("Task 3", "Description 3");
-        Task task4 = new Task("Task 4", "Description 4");
-        Task task5 = new Task("Task 5", "Description 5");
-        Task task6 = new Task("Task 6", "Description 6");
+    public void readHistoryFromFileTest() {
+        Task task = new Task("Task", "Task description");
+        Epic epic = new Epic("Epic", "Epic description");
+        SubTask subTask = new SubTask("Subtask", "Subtask description", 1);
 
-        manager.createTask(task1);
-        manager.createTask(task2);
-        manager.createTask(task3);
-        manager.createTask(task4);
-        manager.createTask(task5);
-        manager.createTask(task6);
+        taskManager.createTask(task);
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask);
 
-        inMemoryHistoryManager.add(task1);
-        inMemoryHistoryManager.add(task2);
-        inMemoryHistoryManager.add(task3);
-        inMemoryHistoryManager.add(task4);
-        inMemoryHistoryManager.add(task5);
-        inMemoryHistoryManager.add(task6);
-        List<Task> history = inMemoryHistoryManager.getHistory();
-        assertEquals(6, history.size());
-        inMemoryHistoryManager.add(task1);
-        assertEquals(6, history.size());
-        inMemoryHistoryManager.remove(0);
-        List<Task> history2 = inMemoryHistoryManager.getHistory();
-        assertEquals(5, history2.size());
+        taskManager.getTaskById(1);
+        taskManager.getEpicById(2);
+        taskManager.getSubTaskById(3);
+
+        FileBackedTaskManager fromFileManager = FileBackedTaskManager.loadFromFile(new File("fileCSV/FileTest.csv"));
+
+        Assertions.assertEquals(taskManager.getHistory(), fromFileManager.getHistory(),
+                "Содержимое истории не соответствует.");
+        Assertions.assertEquals(taskManager.getTaskById(1), fromFileManager.getTaskById(1),
+                "Содержимое task не соответствует.");
+        Assertions.assertEquals(taskManager.getEpicById(2), fromFileManager.getEpicById(2),
+                "Содержимое epic не соответствует.");
+        Assertions.assertEquals(taskManager.getSubTaskById(3), fromFileManager.getSubTaskById(3),
+                "Содержимое epic не соответствует.");
     }
 
     @Test
-    public void testAddTaskToHistory() { // Тест на добавление задачи в историю в InMemoryHistoryManager:
-        Task task = new Task("Задача 1", "Описание 1");
+    public void saveToFileFest() {
+        Task task = new Task("Task", "Task description");
+        Epic epic = new Epic("Epic", "Epic description");
+        SubTask subTask = new SubTask("Subtask", "Subtask description", 1);
 
-        inMemoryHistoryManager.add(task);
+        taskManager.createTask(task);
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask);
 
-        List<Task> history = inMemoryHistoryManager.getHistory();
-        assertTrue(history.contains(task));
+        FileBackedTaskManager fromFileManager = FileBackedTaskManager.loadFromFile(new File("fileCSV/FileTest.csv"));
+
+        ArrayList<Task> tasks = new ArrayList<>();
+
+        tasks.add(fromFileManager.getTaskById(task.getIdNumber()));
+        tasks.add(fromFileManager.getEpicById(epic.getIdNumber()));
+        tasks.add(fromFileManager.getSubTaskById(subTask.getIdNumber()));
+
+        Assertions.assertFalse(tasks.isEmpty());
+        Assertions.assertTrue(tasks.contains(task));
+        Assertions.assertTrue(tasks.contains(epic));
+        Assertions.assertTrue(tasks.contains(subTask));
+        Assertions.assertEquals(taskManager.getAllTasks(), fromFileManager.getAllTasks(),
+                "Task'и не соответствуют.");
+        Assertions.assertEquals(taskManager.getAllEpic(), fromFileManager.getAllEpic(),
+                "Epic'и не соответствуют.");
+        Assertions.assertEquals(taskManager.getAllSubTask(), fromFileManager.getAllSubTask(),
+                "SubTask'и не соответствуют.");
     }
 
     @Test
-    public void testRemoveTaskFromHistory() { // Тест на удаление задачи из истории в InMemoryHistoryManager:
-        Task task = new Task("Задача 1", "Описание 1");
-
-        inMemoryHistoryManager.add(task);
-        inMemoryHistoryManager.remove(task.getIdNumber());
-
-        List<Task> history = inMemoryHistoryManager.getHistory();
-        assertFalse(history.contains(task));
+    public void readingFromNonExistentFileThrowingException() {
+        assertThrows(ManagerSaveException.class, () ->
+                        FileBackedTaskManager.loadFromFile(new File("resources/file.csv")),
+                "Чтение из несуществующего файла не должно осуществляться.");
     }
 
+    @Test
+    public void savingInFileWithWrongPathThrowingException() {
+        FileBackedTaskManager invalidManager = new FileBackedTaskManager(new File("sources/test.csv"));
+        Task task = new Task("Task", "Test description");
+
+        assertThrows(ManagerSaveException.class, () -> invalidManager.createTask(task),
+                "Сохранение в файл с некорректным адресом не должно осуществляться.");
+    }
+
+    @AfterEach
+    public void clearTestCSVFile() {
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
