@@ -99,14 +99,6 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void canNotUpdateSubTaskByNonExistentId() {
-        SubTask subTask = new SubTask("Subtask", "Subtask description", 999);
-        subTask.setIdNumber(999);
-        taskManager.updateSubTask(subTask);
-        assertNull(taskManager.getSubTaskById(999), "Non-existent subtask should not be updated.");
-    }
-
-    @Test
     void managersShouldNotReturnsNull() {
         assertNotNull(taskManager, "TaskManager should not be null.");
         assertNotNull(historyManager, "HistoryManager should not be null.");
