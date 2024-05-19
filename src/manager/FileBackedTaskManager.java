@@ -32,7 +32,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (Writer writer = new FileWriter(file)) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,epic,startTime,duration,endTime\n");
 
             for (Task task : tasks.values()) {
                 writer.write(ConvertioCVS.toString(task) + "\n");
@@ -66,13 +66,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 if (!line.isEmpty()) {
                     Task task = ConvertioCVS.fromString(line);
                     if (task.getType().equals(TaskType.EPIC)) {
+                        fileManager.sortedTasks.add(task);
                         fileManager.epics.put(task.getIdNumber(), (Epic) task);
                     } else if (task.getType().equals(TaskType.SUBTASK)) {
                         fileManager.subTasks.put(task.getIdNumber(), (SubTask) task);
+                        fileManager.sortedTasks.add(task);
+                        fileManager.subTasks.put(task.getIdNumber(), (SubTask) task);
                         Epic epic = fileManager.epics.get(((SubTask) task).getEpicId());
-                        if (epic != null) {
-                            epic.addEpicSubtasksID(task.getIdNumber());
-                        }
+                        epic.addEpicSubtaskId(task.getIdNumber());
+                        fileManager.updateEpicTime(epic);
                     } else {
                         fileManager.tasks.put(task.getIdNumber(), task);
                     }
@@ -96,7 +98,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
-
             fileManager.idNumber = maxNumberId;
         } catch (FileNotFoundException e) {
             throw new ManagerSaveException("Файл не найден.");
@@ -104,6 +105,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Ошибка чтения данных из файла.");
         }
         return fileManager;
+    }
+
+    private void setDefaultId(int id) {
+        this.idNumber = id;
     }
 
     @Override
@@ -164,7 +169,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    protected void updateEpicStatus(int idNumber) {
+    public void updateEpicStatus(int idNumber) {
         super.updateEpicStatus(idNumber);
         save();
     }
