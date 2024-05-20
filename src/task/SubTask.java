@@ -11,19 +11,17 @@ public class SubTask extends Task {
     public SubTask(String taskName, String description, int epicId) {
         super(taskName, description);
         this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
     }
 
     public SubTask(String taskName, String description, int epicId, LocalDateTime startTime, Duration duration) {
         super(taskName, description, startTime, duration);
         this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
     }
 
     public int getEpicId() {
         return epicId;
-    }
-
-    public TaskType getType() {
-        return TaskType.SUBTASK;
     }
 
     @Override
@@ -42,6 +40,14 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" + "задача='" + taskName + '\'' + ", описание='" + description + '\'' + ", id='" + idNumber + '\'' + ", статус='" + statusTask + '\'' + ", эаик ID='" + epicId + '\'' + ", начало времени='" + startTime + '\'' + ", duration='" + duration + '}' + '\'';
+        return "SubTask{" +
+                "задача='" + taskName + '\'' +
+                ", описание='" + description + '\'' +
+                ", id='" + idNumber + '\'' +
+                ", статус='" + statusTask + '\'' +
+                ", эаик ID='" + epicId + '\'' +
+                ", начало времени='" + startTime + '\'' +
+                ", duration='" + duration +
+                '}';
     }
 }

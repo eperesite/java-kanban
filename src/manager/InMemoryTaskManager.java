@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    protected HashMap<Integer, Task> tasks = new HashMap<>();
-    protected HashMap<Integer, Epic> epics = new HashMap<>();
-    protected HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    protected Map<Integer, Task> tasks = new HashMap<>();
+    protected Map<Integer, Epic> epics = new HashMap<>();
+    protected Map<Integer, SubTask> subTasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected int idNumber = 0;
 
@@ -34,16 +34,16 @@ public class InMemoryTaskManager implements TaskManager {
         return sortedTasks;
     }
 
-    @Override
     public boolean isCrossingTasks(Task task) {
         if (task.getStartTime() != null && task.getDuration() != null) {
-            return !sortedTasks.stream().filter(t -> t.getStartTime() != null && t.getDuration() != null).allMatch(t -> ((task.getStartTime().isBefore(t.getStartTime()) && task.getEndTime().isBefore(t.getStartTime())) || (task.getStartTime().isAfter(t.getEndTime()) && task.getEndTime().isAfter(t.getEndTime()))));
+            int taskId = task.getIdNumber();
+            return !sortedTasks.stream().filter(t -> t.getIdNumber() != taskId && t.getStartTime() != null && t.getDuration() != null).allMatch(t -> (task.getEndTime().isBefore(t.getStartTime()) || task.getStartTime().isAfter(t.getEndTime())));
         }
         return true;
     }
 
     protected void updateEpicTime(Epic epic) {
-        Duration epicDuration;
+        Duration epicDuration = null;
         LocalDateTime earlyStartTime = LocalDateTime.MAX;
         LocalDateTime lateEndTime = LocalDateTime.MIN;
 
@@ -56,35 +56,39 @@ public class InMemoryTaskManager implements TaskManager {
                         earlyStartTime = subTask.getStartTime();
                     }
 
-                    if (lateEndTime.isBefore(subTask.getEndTime())) {
-                        lateEndTime = subTask.getEndTime();
+                    LocalDateTime subTaskEndTime = subTask.getStartTime().plus(subTask.getDuration());
+                    if (lateEndTime.isBefore(subTaskEndTime)) {
+                        lateEndTime = subTaskEndTime;
                     }
-                    epicDuration = Duration.between(earlyStartTime, lateEndTime);
-
-                    epic.setStartTime(earlyStartTime);
-                    epic.setEndTime(lateEndTime);
-                    epic.setDuration(epicDuration);
                 }
             }
-        } else {
-            epic.setStartTime(null);
-            epic.setEndTime(null);
-            epic.setDuration(null);
+
+            if (!earlyStartTime.equals(LocalDateTime.MAX) && !lateEndTime.equals(LocalDateTime.MIN)) {
+                epicDuration = Duration.between(earlyStartTime, lateEndTime);
+            }
         }
+
+        epic.setStartTime(epicDuration != null ? earlyStartTime : null);
+        epic.setEndTime(epicDuration != null ? lateEndTime : null);
+        epic.setDuration(epicDuration);
     }
 
     @Override
     public void createTask(Task task) {
-        int id = generateId();
-        task.setIdNumber(id);
-        if (isCrossingTasks(task)) {
-            task.setDuration(null);
-            task.setStartTime(null);
-            sortedTasks.add(task);
+        if (task.getStartTime() != null && task.getDuration() != null) {
+            int id = generateId();
+            task.setIdNumber(id);
+            if (isCrossingTasks(task)) {
+                task.setDuration(null);
+                task.setStartTime(null);
+                System.out.println("Ошибка: задача пересекается с другими задачами и не может быть добавлена.");
+            } else {
+                sortedTasks.add(task);
+                tasks.put(id, task);
+            }
         } else {
-            sortedTasks.add(task);
+            System.out.println("Ошибка: время начала и продолжительность задачи должны быть установлены.");
         }
-        tasks.put(id, task);
     }
 
     @Override
@@ -94,26 +98,29 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(id, epic);
     }
 
-
     @Override
     public void createSubTask(SubTask newSubTask) {
-        int id = generateId();
-        newSubTask.setIdNumber(id);
-        if (isCrossingTasks(newSubTask)) {
-            newSubTask.setDuration(null);
-            newSubTask.setStartTime(null);
-            sortedTasks.add(newSubTask);
+        if (epics.containsKey(newSubTask.getEpicId())) {
+            if (newSubTask.getStartTime() != null && newSubTask.getDuration() != null) {
+                int id = generateId();
+                newSubTask.setIdNumber(id);
+                if (isCrossingTasks(newSubTask)) {
+                    newSubTask.setDuration(null);
+                    newSubTask.setStartTime(null);
+                    System.out.println("Ошибка: подзадача пересекается с другими задачами и не может быть добавлена.");
+                } else {
+                    sortedTasks.add(newSubTask);
+                    subTasks.put(newSubTask.getIdNumber(), newSubTask);
+                    ArrayList<Integer> subTaskIdList = epics.get(newSubTask.getEpicId()).getSubTaskIds();
+                    subTaskIdList.add(newSubTask.getIdNumber());
+                    updateEpicStatus(newSubTask.getEpicId());
+                    updateEpicTime(epics.get(newSubTask.getEpicId()));
+                }
+            } else {
+                System.out.println("Ошибка: время начала и продолжительность подзадачи должны быть установлены.");
+            }
         } else {
-            sortedTasks.add(newSubTask);
-        }
-        subTasks.put(newSubTask.getIdNumber(), newSubTask);
-
-        if (epics.get(newSubTask.getEpicId()) != null) {
-            int epicId = newSubTask.getEpicId();
-            ArrayList<Integer> subTaskIdList = epics.get(epicId).getSubTaskIds();
-            subTaskIdList.add(newSubTask.getIdNumber());
-            updateEpicStatus(epicId);
-            updateEpicTime(epics.get(newSubTask.getEpicId()));
+            System.out.println("Ошибка: указанный эпик не существует.");
         }
     }
 
@@ -167,36 +174,36 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getIdNumber())) {
-            if (isCrossingTasks(task)) {
-                task.setDuration(null);
-                task.setStartTime(null);
+            Task oldTask = tasks.get(task.getIdNumber());
+            if (!isCrossingTasks(task)) {
+                sortedTasks.remove(oldTask);
+                tasks.put(task.getIdNumber(), task);
+                sortedTasks.add(task);
+            } else {
+                System.out.println("Ошибка: новое состояние задачи пересекается с другими задачами и не может быть обновлено.");
             }
-            tasks.put(task.getIdNumber(), task);
-
-            sortedTasks = sortedTasks.stream().filter(t -> t.getIdNumber() != task.getIdNumber()).collect(Collectors.toCollection(() -> new TreeSet<>(comparator)));
-            sortedTasks.add(task);
         }
     }
+
 
     @Override
     public void updateSubTask(SubTask newSubTask) {
         if (subTasks.containsKey(newSubTask.getIdNumber())) {
-            if (isCrossingTasks(newSubTask)) {
-                newSubTask.setDuration(null);
-                newSubTask.setStartTime(null);
+            SubTask oldSubTask = subTasks.get(newSubTask.getIdNumber());
+            if (!isCrossingTasks(newSubTask)) {
+                subTasks.put(newSubTask.getIdNumber(), newSubTask);
+                sortedTasks.remove(oldSubTask);
+                sortedTasks.add(newSubTask);
+                if (epics.containsKey(newSubTask.getEpicId())) {
+                    updateEpicStatus(newSubTask.getEpicId());
+                    updateEpicTime(epics.get(newSubTask.getEpicId()));
+                }
+            } else {
+                System.out.println("Ошибка: новое состояние подзадачи пересекается с другими и не может быть обновлено.");
             }
-
-            subTasks.put(newSubTask.getIdNumber(), newSubTask);
-
-            if (epics.get(newSubTask.getEpicId()) != null) {
-                updateEpicStatus(newSubTask.getEpicId());
-                updateEpicTime(epics.get(newSubTask.getEpicId()));
-            }
-
-            sortedTasks = sortedTasks.stream().filter(t -> t.getIdNumber() != newSubTask.getIdNumber()).collect(Collectors.toCollection(() -> new TreeSet<>(comparator)));
-            sortedTasks.add(newSubTask);
         }
     }
+
 
     @Override
     public void updateEpic(Epic epic) {
@@ -244,14 +251,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllEpics() {
-        epics.values().stream().forEach(epic -> {
-            epics.get(epic.getIdNumber()).getSubTaskIds().stream().forEach(id -> {
+        epics.values().forEach(epic -> {
+            epic.getSubTaskIds().forEach(id -> {
                 historyManager.remove(id);
                 sortedTasks.remove(subTasks.get(id));
                 subTasks.remove(id);
             });
             historyManager.remove(epic.getIdNumber());
-
         });
         epics.clear();
     }
@@ -301,15 +307,10 @@ public class InMemoryTaskManager implements TaskManager {
         updateEpicTime(epics.get(epicId));
     }
 
-    @Override
-    public int generateId() {
+    private int generateId() {
         return idNumber++;
     }
 
-    @Override
-    public Integer getId() {
-        return idNumber;
-    }
 
     @Override
     public List<Task> getHistory() {

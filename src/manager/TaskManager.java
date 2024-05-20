@@ -74,11 +74,5 @@ public interface TaskManager {
 
     void updateEpicStatus(int id);
 
-    boolean isCrossingTasks(Task task);
-
-
-    int generateId();
-
-    Integer getId();
 
 }
