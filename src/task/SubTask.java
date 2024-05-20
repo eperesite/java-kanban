@@ -40,14 +40,6 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" +
-                "задача='" + taskName + '\'' +
-                ", описание='" + description + '\'' +
-                ", id='" + idNumber + '\'' +
-                ", статус='" + statusTask + '\'' +
-                ", эаик ID='" + epicId + '\'' +
-                ", начало времени='" + startTime + '\'' +
-                ", duration='" + duration +
-                '}';
+        return "SubTask{" + "задача='" + taskName + '\'' + ", описание='" + description + '\'' + ", id='" + idNumber + '\'' + ", статус='" + statusTask + '\'' + ", эаик ID='" + epicId + '\'' + ", начало времени='" + startTime + '\'' + ", duration='" + duration + '}';
     }
 }

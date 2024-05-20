@@ -9,7 +9,6 @@ import task.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -204,7 +203,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     @Override
     public void updateEpic(Epic epic) {
         if (epics.containsKey(epic.getIdNumber())) {
@@ -310,7 +308,6 @@ public class InMemoryTaskManager implements TaskManager {
     private int generateId() {
         return idNumber++;
     }
-
 
     @Override
     public List<Task> getHistory() {
