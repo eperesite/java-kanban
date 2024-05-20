@@ -3,7 +3,6 @@ package test;
 import manager.*;
 import task.Epic;
 import task.SubTask;
-import task.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -53,7 +52,6 @@ class InMemoryTaskManagerTest {
         assertEquals(1, epics.size(), "Incorrect number of epics in the list.");
         assertEquals(epic, epics.get(0), "Epics do not match.");
     }
-
 
     @Test
     void canNotUpdateEpicByNonExistentId() {
