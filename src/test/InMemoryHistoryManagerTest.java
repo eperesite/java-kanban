@@ -8,8 +8,6 @@ import task.Epic;
 import task.SubTask;
 import task.Task;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
