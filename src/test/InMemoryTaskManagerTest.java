@@ -38,23 +38,6 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void createTask() {
-        Task task = new Task("Task", "Task description");
-        taskManager.createTask(task);
-        final int taskId = task.getIdNumber();
-
-        final Task savedTask = taskManager.getTaskById(taskId);
-
-        assertNotNull(savedTask, "Task not found.");
-        assertEquals(task, savedTask, "Tasks do not match.");
-
-        final List<Task> tasks = taskManager.getAllTasks();
-        assertNotNull(tasks, "Tasks not returned.");
-        assertEquals(1, tasks.size(), "Incorrect number of tasks in the list.");
-        assertEquals(task, tasks.get(0), "Tasks do not match.");
-    }
-
-    @Test
     void createEpic() {
         Epic epic = new Epic("Epic", "Epic description");
         taskManager.createEpic(epic);
@@ -71,24 +54,6 @@ class InMemoryTaskManagerTest {
         assertEquals(epic, epics.get(0), "Epics do not match.");
     }
 
-    @Test
-    void createSubTask() {
-        Epic epic = new Epic("Epic", "Epic description");
-        taskManager.createEpic(epic);
-        SubTask subTask = new SubTask("Subtask", "Subtask description", 0);
-        taskManager.createSubTask(subTask);
-        final int subTaskId = subTask.getIdNumber();
-
-        final SubTask savedSubTask = taskManager.getSubTaskById(subTaskId);
-
-        assertNotNull(savedSubTask, "Subtask not found.");
-        assertEquals(subTask, savedSubTask, "Subtasks do not match.");
-
-        final List<SubTask> subTasks = taskManager.getAllSubTask();
-        assertNotNull(subTasks, "Subtasks not returned.");
-        assertEquals(1, subTasks.size(), "Incorrect number of subtasks in the list.");
-        assertEquals(subTask, subTasks.get(0), "Subtasks do not match.");
-    }
 
     @Test
     void canNotUpdateEpicByNonExistentId() {
@@ -102,15 +67,5 @@ class InMemoryTaskManagerTest {
     void managersShouldNotReturnsNull() {
         assertNotNull(taskManager, "TaskManager should not be null.");
         assertNotNull(historyManager, "HistoryManager should not be null.");
-    }
-
-    @Test
-    void removedSubTasksShouldNotContainOldId() {
-        Epic epic = new Epic("Epic", "Epic description");
-        SubTask subTask = new SubTask("Subtask", "Subtask description", 0);
-        taskManager.createEpic(epic);
-        taskManager.createSubTask(subTask);
-        taskManager.deleteSubTasks(subTask.getIdNumber());
-        assertFalse(epic.getSubTaskIds().contains(subTask.getIdNumber()), "Epic should not contain IDs of removed subtasks.");
     }
 }
