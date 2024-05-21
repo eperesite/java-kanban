@@ -33,7 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
         return sortedTasks;
     }
 
-    public boolean isCrossingTasks(Task task) {
+    private boolean isCrossingTasks(Task task) {
         if (task.getStartTime() != null && task.getDuration() != null) {
             int taskId = task.getIdNumber();
             return !sortedTasks.stream().filter(t -> t.getIdNumber() != taskId && t.getStartTime() != null && t.getDuration() != null).allMatch(t -> (task.getEndTime().isBefore(t.getStartTime()) || task.getStartTime().isAfter(t.getEndTime())));
@@ -42,7 +42,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void updateEpicTime(Epic epic) {
-        Duration epicDuration = null;
+        Duration epicDuration = Duration.ZERO;
         LocalDateTime earlyStartTime = LocalDateTime.MAX;
         LocalDateTime lateEndTime = LocalDateTime.MIN;
 
@@ -59,34 +59,39 @@ public class InMemoryTaskManager implements TaskManager {
                     if (lateEndTime.isBefore(subTaskEndTime)) {
                         lateEndTime = subTaskEndTime;
                     }
+
+                    epicDuration = epicDuration.plus(subTask.getDuration());
                 }
             }
 
             if (!earlyStartTime.equals(LocalDateTime.MAX) && !lateEndTime.equals(LocalDateTime.MIN)) {
-                epicDuration = Duration.between(earlyStartTime, lateEndTime);
+                epic.setStartTime(earlyStartTime);
+                epic.setEndTime(lateEndTime);
+            } else {
+                epic.setStartTime(null);
+                epic.setEndTime(null);
             }
+        } else {
+            epic.setStartTime(null);
+            epic.setEndTime(null);
+            epicDuration = null;
         }
 
-        epic.setStartTime(epicDuration != null ? earlyStartTime : null);
-        epic.setEndTime(epicDuration != null ? lateEndTime : null);
         epic.setDuration(epicDuration);
     }
 
     @Override
     public void createTask(Task task) {
+        int id = generateId();
+        task.setIdNumber(id);
+        tasks.put(id, task);
+
         if (task.getStartTime() != null && task.getDuration() != null) {
-            int id = generateId();
-            task.setIdNumber(id);
             if (isCrossingTasks(task)) {
-                task.setDuration(null);
-                task.setStartTime(null);
                 System.out.println("Ошибка: задача пересекается с другими задачами и не может быть добавлена.");
             } else {
                 sortedTasks.add(task);
-                tasks.put(id, task);
             }
-        } else {
-            System.out.println("Ошибка: время начала и продолжительность задачи должны быть установлены.");
         }
     }
 
@@ -100,24 +105,20 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubTask(SubTask newSubTask) {
         if (epics.containsKey(newSubTask.getEpicId())) {
+            int id = generateId();
+            newSubTask.setIdNumber(id);
+            subTasks.put(newSubTask.getIdNumber(), newSubTask);
+            epics.get(newSubTask.getEpicId()).getSubTaskIds().add(newSubTask.getIdNumber());
+
             if (newSubTask.getStartTime() != null && newSubTask.getDuration() != null) {
-                int id = generateId();
-                newSubTask.setIdNumber(id);
                 if (isCrossingTasks(newSubTask)) {
-                    newSubTask.setDuration(null);
-                    newSubTask.setStartTime(null);
                     System.out.println("Ошибка: подзадача пересекается с другими задачами и не может быть добавлена.");
                 } else {
                     sortedTasks.add(newSubTask);
-                    subTasks.put(newSubTask.getIdNumber(), newSubTask);
-                    ArrayList<Integer> subTaskIdList = epics.get(newSubTask.getEpicId()).getSubTaskIds();
-                    subTaskIdList.add(newSubTask.getIdNumber());
-                    updateEpicStatus(newSubTask.getEpicId());
-                    updateEpicTime(epics.get(newSubTask.getEpicId()));
                 }
-            } else {
-                System.out.println("Ошибка: время начала и продолжительность подзадачи должны быть установлены.");
             }
+            updateEpicStatus(newSubTask.getEpicId());
+            updateEpicTime(epics.get(newSubTask.getEpicId()));
         } else {
             System.out.println("Ошибка: указанный эпик не существует.");
         }
