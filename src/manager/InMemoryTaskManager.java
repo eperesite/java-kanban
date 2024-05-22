@@ -38,7 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
             int taskId = task.getIdNumber();
             return !sortedTasks.stream().filter(t -> t.getIdNumber() != taskId && t.getStartTime() != null && t.getDuration() != null).allMatch(t -> (task.getEndTime().isBefore(t.getStartTime()) || task.getStartTime().isAfter(t.getEndTime())));
         }
-        return true;
+        return false;
     }
 
     protected void updateEpicTime(Epic epic) {
@@ -82,14 +82,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
-        int id = generateId();
-        task.setIdNumber(id);
-        tasks.put(id, task);
-
-        if (task.getStartTime() != null && task.getDuration() != null) {
-            if (isCrossingTasks(task)) {
-                System.out.println("Ошибка: задача пересекается с другими задачами и не может быть добавлена.");
-            } else {
+        if (isCrossingTasks(task)) {
+            System.out.println("Ошибка: задача пересекается с другими задачами и не может быть добавлена.");
+        } else {
+            int id = generateId();
+            task.setIdNumber(id);
+            tasks.put(id, task);
+            if (task.getStartTime() != null && task.getDuration() != null) {
                 sortedTasks.add(task);
             }
         }
@@ -105,22 +104,19 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubTask(SubTask newSubTask) {
         if (epics.containsKey(newSubTask.getEpicId())) {
-            int id = generateId();
-            newSubTask.setIdNumber(id);
-            subTasks.put(newSubTask.getIdNumber(), newSubTask);
-            epics.get(newSubTask.getEpicId()).getSubTaskIds().add(newSubTask.getIdNumber());
-
-            if (newSubTask.getStartTime() != null && newSubTask.getDuration() != null) {
-                if (isCrossingTasks(newSubTask)) {
-                    System.out.println("Ошибка: подзадача пересекается с другими задачами и не может быть добавлена.");
-                } else {
+            if (isCrossingTasks(newSubTask)) {
+                System.out.println("Ошибка: подзадача пересекается с другими задачами и не может быть добавлена.");
+            } else {
+                int id = generateId();
+                newSubTask.setIdNumber(id);
+                subTasks.put(newSubTask.getIdNumber(), newSubTask);
+                epics.get(newSubTask.getEpicId()).getSubTaskIds().add(newSubTask.getIdNumber());
+                if (newSubTask.getStartTime() != null && newSubTask.getDuration() != null) {
                     sortedTasks.add(newSubTask);
                 }
+                updateEpicStatus(newSubTask.getEpicId());
+                updateEpicTime(epics.get(newSubTask.getEpicId()));
             }
-            updateEpicStatus(newSubTask.getEpicId());
-            updateEpicTime(epics.get(newSubTask.getEpicId()));
-        } else {
-            System.out.println("Ошибка: указанный эпик не существует.");
         }
     }
 
