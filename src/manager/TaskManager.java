@@ -7,7 +7,7 @@ import task.Task;
 import java.util.List;
 import java.util.TreeSet;
 
-public interface TaskManager {
+public interface TaskManager {1
     //получение списка всех задач
     List<Task> getAllTasks();
 

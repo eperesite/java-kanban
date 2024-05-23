@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import manager.TaskManager;
 import server.HttpTaskServer;
 
-public class HistoryHandler extends AbstractHandler {
+public class HistoryHandler extends AbstractHandler {1
     private final TaskManager taskManager;
     private final Gson gson;
 
