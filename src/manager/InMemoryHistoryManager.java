@@ -7,94 +7,76 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class InMemoryHistoryManager implements HistoryManager {
-    private Map<Integer, Node> taskMap = new HashMap<>();
-    private Node head;
-    private Node tail;
+
+    private final Map<Integer, Node> history = new HashMap<>();
+    private Node first;
+    private Node last;
+
+    private void linkLast(Task task) {
+        final Node l = last;
+        final Node newNode = new Node(l, task, null);
+        last = newNode;
+        if (l == null) {
+            first = newNode;
+        } else {
+            l.setNext(newNode);
+        }
+    }
+
+    private List<Task> getTasks() {
+        List<Task> task = new ArrayList<>();
+        Node node = first;
+
+        while (node != null) {
+            task.add(node.getObject());
+            node = node.getNext();
+        }
+        return task;
+    }
+
+    public void removeNode(Node node) {
+        if (node != null) {
+            final Node next = node.getNext();
+            final Node prev = node.getPrevious();
+            if (prev == null) {
+                first = next;
+            } else {
+                prev.setNext(next);
+            }
+            if (next == null) {
+                last = prev;
+            } else {
+                next.setPrevious(prev);
+            }
+        }
+    }
 
     @Override
     public void add(Task task) {
-        int taskId = task.getTaskID();
-        if (taskMap.containsKey(taskId)) {
-            Node nodeToRemove = taskMap.get(taskId);
-            removeNode(nodeToRemove);
-        }
-
-        Node newNode = new Node(task);
-        if (head == null) {
-            head = newNode;
+        if (history.isEmpty()) {
+            linkLast(task);
+            history.put(task.getIdNumber(), last);
         } else {
-            tail.next = newNode;
-            newNode.prev = tail;
+            if (history.containsKey(task.getIdNumber())) {
+                remove(task.getIdNumber());
+                linkLast(task);
+                history.put(task.getIdNumber(), last);
+            } else {
+                linkLast(task);
+                history.put(task.getIdNumber(), last);
+            }
         }
-        tail = newNode;
-        taskMap.put(taskId, newNode);
     }
 
     @Override
     public void remove(int id) {
-        if (taskMap.containsKey(id)) {
-            Node nodeToRemove = taskMap.get(id);
-            removeNode(nodeToRemove);
-        }
+        removeNode(history.get(id));
+        history.remove(id);
     }
-
-
-
-    private void removeNode(Node nodeToRemove) {
-        System.out.println("Removing task: " + nodeToRemove.task.getNameTask());
-        taskMap.remove(nodeToRemove.task.getTaskID());
-        if (nodeToRemove == head && nodeToRemove == tail) {
-
-            head = null;
-            tail = null;
-        } else if (nodeToRemove == head) {
-
-            head = nodeToRemove.next;
-            head.prev = null;
-        } else if (nodeToRemove == tail) {
-
-            tail = nodeToRemove.prev;
-            tail.next = null;
-        } else {
-
-            nodeToRemove.prev.next = nodeToRemove.next;
-            nodeToRemove.next.prev = nodeToRemove.prev;
-        }
-    }
-
 
     @Override
     public List<Task> getHistory() {
-        List<Task> history = new ArrayList<>();
-        Node current = head;
-        while (current != null) {
-            history.add(current.task);
-            current = current.next;
-        }
-        return history;
-    }
-
-    public void removeTasksOfType(Class<?> type) {
-        List<Node> nodesToRemove = new ArrayList<>();
-        for (Node node : taskMap.values()) {
-            if (type.isInstance(node.task)) {
-                nodesToRemove.add(node);
-            }
-        }
-        for (Node nodeToRemove : nodesToRemove) {
-            removeNode(nodeToRemove);
-        }
-    }
-
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        Node(Task task) {
-            this.task = task;
-        }
+        return getTasks();
     }
 }

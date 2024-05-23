@@ -1,43 +1,69 @@
 package test;
 
 import manager.*;
+import task.Epic;
+import task.SubTask;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
-
 import org.junit.jupiter.api.Test;
-
-import task.Task;
-
-import task.TaskStatus;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest {
     private TaskManager taskManager;
+    private HistoryManager historyManager;
 
     @BeforeEach
-    public void setUp() {
-        HistoryManager historyManager = new InMemoryHistoryManager();
-        taskManager = new InMemoryTaskManager(historyManager);
+    public void beforeEach() {
+        taskManager = new InMemoryTaskManager();
+        historyManager = Managers.getDefaultHistory();
+    }
+
+   /* @Test
+    void shouldSetDurationAndStartTimeToNullForSubTasks() {
+        LocalDateTime now = LocalDateTime.now();
+        Epic epic = new Epic("Epic", "Epic description");
+        taskManager.createEpic(epic);
+        SubTask subtask = new SubTask("Task", "Task description", 0, now, Duration.ofDays(5));
+        taskManager.createSubTask(subtask);
+        SubTask crossingSubTask = new SubTask("Task", "Task description", 0, now, Duration.ofDays(3));
+        taskManager.createSubTask(crossingSubTask);
+        assertNull(crossingSubTask.getDuration());
+        assertNull(crossingSubTask.getStartTime());
+    }*/
+
+    @Test
+    void createEpic() {
+        Epic epic = new Epic("Epic", "Epic description");
+        taskManager.createEpic(epic);
+        final int epicId = epic.getIdNumber();
+
+        final Epic savedEpic = taskManager.getEpicById(epicId);
+
+        assertNotNull(savedEpic, "Epic not found.");
+        assertEquals(epic, savedEpic, "Epics do not match.");
+
+        final List<Epic> epics = taskManager.getAllEpic();
+        assertNotNull(epics, "Epics not returned.");
+        assertEquals(1, epics.size(), "Incorrect number of epics in the list.");
+        assertEquals(epic, epics.get(0), "Epics do not match.");
     }
 
     @Test
-    public void testCreateNewTask() {
-        Task task = new Task("Test Task", "Test Description", TaskStatus.NEW);
-        Task createdTask = taskManager.createNewTask(task);
-        assertNotNull(createdTask);
-        assertEquals(task, createdTask);
+    void canNotUpdateEpicByNonExistentId() {
+        Epic epic = new Epic("Epic", "Epic description");
+        epic.setIdNumber(999);
+        taskManager.updateEpic(epic);
+        assertNull(taskManager.getEpicById(999), "Non-existent epic should not be updated.");
     }
 
     @Test
-    public void testDeleteAllTask() {
-        Task task = new Task("Test Task", "Test Description", TaskStatus.NEW);
-        taskManager.createNewTask(task);
-        taskManager.deleteAllTask();
-        List<Task> tasks = taskManager.getAllTask();
-        assertEquals(0, tasks.size());
+    void managersShouldNotReturnsNull() {
+        assertNotNull(taskManager, "TaskManager should not be null.");
+        assertNotNull(historyManager, "HistoryManager should not be null.");
     }
-
 }

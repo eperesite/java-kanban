@@ -1,0 +1,5 @@
+﻿id;type;name;status;description;epic
+1;TASK;Задача 2;NEW;Описание 2;
+2;EPIC;План 1;NEW;Описание плана 1;
+5;SUBTASK;Исполнение плана 2;NEW;Описание 2;2
+6;SUBTASK;Исполнение плана 3;NEW;Описание 3;2

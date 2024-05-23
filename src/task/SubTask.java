@@ -1,21 +1,27 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
-    private int epicId;
 
-    public SubTask(String nameTask, String description, TaskStatus status, int epicId) {
-        super(nameTask, description, status);
+    private final int epicId;
+
+    public SubTask(String taskName, String description, int epicId) {
+        super(taskName, description);
         this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
+    }
+
+    public SubTask(String taskName, String description, int epicId, LocalDateTime startTime, Duration duration) {
+        super(taskName, description, startTime, duration);
+        this.epicId = epicId;
+        this.type = TaskType.SUBTASK;
     }
 
     public int getEpicId() {
         return epicId;
-    }
-
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
     }
 
     @Override
@@ -34,8 +40,6 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{" + super.toString() +
-                "epicId=" + epicId +
-                '}';
+        return "SubTask{" + "задача='" + taskName + '\'' + ", описание='" + description + '\'' + ", id='" + idNumber + '\'' + ", статус='" + statusTask + '\'' + ", эаик ID='" + epicId + '\'' + ", начало времени='" + startTime + '\'' + ", duration='" + duration + '}';
     }
 }
