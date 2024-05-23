@@ -6,7 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public abstract class AbstractHandler implements HttpHandler {
+public abstract class AbstractHandler implements HttpHandler {1
 
     protected int parsePathId(String pathId) {
         return Integer.parseInt(pathId);

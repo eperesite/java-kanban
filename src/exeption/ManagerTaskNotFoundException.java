@@ -2,7 +2,7 @@ package exeption;
 
 import task.TaskType;
 
-public class ManagerTaskNotFoundException extends RuntimeException {
+public class ManagerTaskNotFoundException extends RuntimeException {1
     public ManagerTaskNotFoundException(String message) {
         super(message);
     }
