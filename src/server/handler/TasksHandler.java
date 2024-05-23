@@ -10,7 +10,7 @@ import task.Task;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class TasksHandler extends AbstractHandler {1
+public class TasksHandler extends AbstractHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
