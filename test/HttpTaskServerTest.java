@@ -41,10 +41,8 @@ public class HttpTaskServerTest {
         Task task2 = new Task("Task2", "Task description", LocalDateTime.of(2024, 01, 01, 01, 00), Duration.ofMinutes(15));
         Epic epic3 = new Epic("Epic3", "Epic description");
         Epic epic4 = new Epic("Epic4", "Epic description");
-        SubTask subTask5 = new SubTask("Subtask5", "Subtask description", 3, LocalDateTime.of(2024, 01, 01, 02, 00),
-                Duration.ofMinutes(15));
-        SubTask subTask6 = new SubTask("Subtask6", "Subtask description", 3, LocalDateTime.of(2024, 01, 01, 03, 00),
-                Duration.ofMinutes(15));
+        SubTask subTask5 = new SubTask("Subtask5", "Subtask description", 3, LocalDateTime.of(2024, 01, 01, 02, 00), Duration.ofMinutes(15));
+        SubTask subTask6 = new SubTask("Subtask6", "Subtask description", 3, LocalDateTime.of(2024, 01, 01, 03, 00), Duration.ofMinutes(15));
 
         taskManager.createTask(task1);
         taskManager.createTask(task2);
@@ -55,6 +53,32 @@ public class HttpTaskServerTest {
 
         taskServer.start();
     }
+
+    @Test
+    public void testAddTask() throws IOException, InterruptedException {
+        // создаём задачу
+        Task task = new Task("Test 2", "Testing task 2", TaskStatus.NEW, Duration.ofMinutes(5), LocalDateTime.now());
+        // конвертируем её в JSON
+        String taskJson = gson.toJson(task);
+
+        // создаём HTTP-клиент и запрос
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+
+        // вызываем рест, отвечающий за создание задач
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // проверяем код ответа
+        assertEquals(200, response.statusCode());
+
+        // проверяем, что создалась одна задача с корректным именем
+        List<Task> tasksFromManager = manager.getTasks();
+
+        assertNotNull(tasksFromManager, "Задачи не возвращаются");
+        assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
+        assertEquals("Test 2", tasksFromManager.get(0).getName(), "Некорректное имя задачи");
+    }
+}
 
     @Test
     public void removeAllTasksByDeleteRequest() throws IOException, InterruptedException {
@@ -94,6 +118,7 @@ public class HttpTaskServerTest {
 
         assertTrue(taskManager.getAllSubTask().isEmpty(), "Подзадачи не удалены.");
     }
+
     @Test
     public void getPrioritizedTasksByGetRequest() throws IOException, InterruptedException {
         TreeSet<Task> sortedTasks = taskManager.getPrioritizedTasks();
@@ -143,12 +168,12 @@ public class HttpTaskServerTest {
         taskServer.stop();
     }
 
-    class TasksArrayListTypeToken extends TypeToken<ArrayList<Task>> {
-    }
+class TasksArrayListTypeToken extends TypeToken<ArrayList<Task>> {
+}
 
-    class EpicsArrayListTypeToken extends TypeToken<ArrayList<Epic>> {
-    }
+class EpicsArrayListTypeToken extends TypeToken<ArrayList<Epic>> {
+}
 
-    class SubTasksArrayListTypeToken extends TypeToken<ArrayList<SubTask>> {
-    }
+class SubTasksArrayListTypeToken extends TypeToken<ArrayList<SubTask>> {
+}
 }
