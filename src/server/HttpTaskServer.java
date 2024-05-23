@@ -21,7 +21,7 @@ public class HttpTaskServer {
     private TaskManager manager;
 
     // создать конструктор
-    public HttpTaskServer(TaskManager manager) throws IOException {
+    public HttpTaskServer(TaskManager manager) throws IOException {1
         this.manager = manager;
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);

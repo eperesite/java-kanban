@@ -8,7 +8,7 @@ import server.HttpTaskServer;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class PrioritizedHandler extends AbstractHandler {
+public class PrioritizedHandler extends AbstractHandler {1
     private final TaskManager taskManager;
     private final Gson gson;
 
