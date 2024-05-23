@@ -11,7 +11,7 @@ import task.SubTask;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class SubtasksHandler extends AbstractHandler {1
+public class SubtasksHandler extends AbstractHandler {
     private final TaskManager taskManager;
     private final Gson gson;
 
