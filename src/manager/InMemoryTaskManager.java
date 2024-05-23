@@ -33,7 +33,8 @@ public class InMemoryTaskManager implements TaskManager {
         return sortedTasks;
     }
 
-    private boolean isCrossingTasks(Task task) {
+    @Override
+    public boolean isCrossingTasks(Task task) {
         if (task.getStartTime() != null && task.getDuration() != null) {
             int taskId = task.getIdNumber();
             return !sortedTasks.stream().filter(t -> t.getIdNumber() != taskId && t.getStartTime() != null && t.getDuration() != null).allMatch(t -> (task.getEndTime().isBefore(t.getStartTime()) || task.getStartTime().isAfter(t.getEndTime())));
