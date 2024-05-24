@@ -25,7 +25,7 @@ public class SubtasksHandler extends AbstractHandler {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
 
-        try (exchange) {
+        try {
             switch (method) {
                 case "GET": {
                     // ecли путь "/subtasks"
