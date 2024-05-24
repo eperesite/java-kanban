@@ -7,7 +7,6 @@ import manager.TaskManager;
 import server.HttpTaskServer;
 import task.Epic;
 
-
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -25,17 +24,15 @@ public class EpicsHandler extends AbstractHandler {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
 
-        try (exchange) {
+        try {
             switch (method) {
                 case "GET": {
-                    // ecли путь "/epics"
                     if (Pattern.matches("^/epics$", path)) {
                         String response = gson.toJson(taskManager.getAllEpic());
                         writeResponse(exchange, response);
                         break;
                     }
 
-                    // ecли путь "/epics/{id}"
                     if (Pattern.matches("^/epics/\\d+$", path)) {
                         String pathId = path.substring(7);
                         int id = parsePathId(pathId);
@@ -44,7 +41,6 @@ public class EpicsHandler extends AbstractHandler {
                         break;
                     }
 
-                    // ecли путь "/epics/{id}/subtasks"
                     if (Pattern.matches("^/epics/\\d+/subtasks$", path)) {
                         String pathId = path.substring(7, (path.length() - 9));
                         int id = parsePathId(pathId);
@@ -55,7 +51,6 @@ public class EpicsHandler extends AbstractHandler {
                     break;
                 }
                 case "DELETE": {
-                    // ecли путь "/epics?id=[id]"
                     if (Pattern.matches("^/epics$", path)) {
                         String query = exchange.getRequestURI().getQuery();
 
@@ -79,7 +74,6 @@ public class EpicsHandler extends AbstractHandler {
                     }
                     Epic epic = gson.fromJson(request, Epic.class);
 
-                    // ecли путь "/epics"
                     if (Pattern.matches("^/epics$", path)) {
                         if (epic.getIdNumber() != null) {
                             taskManager.updateEpic(epic);
@@ -102,6 +96,8 @@ public class EpicsHandler extends AbstractHandler {
         } catch (Throwable exception) {
             exception.printStackTrace();
             sendInternalServerErrorResponseHeaders(exchange);
+        } finally {
+            exchange.close();
         }
     }
 }
