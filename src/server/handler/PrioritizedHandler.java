@@ -22,7 +22,7 @@ public class PrioritizedHandler extends AbstractHandler {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
 
-        try (exchange) {
+        try {
             switch (method) {
                 case "GET": {
                     if (Pattern.matches("^/prioritized$", path)) {
